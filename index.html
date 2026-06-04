@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1D9E75" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tage Mage" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Tage Mage — Maths</title>
+  <style>
+    :root {
+      --green: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-dark: #085041;
+      --green-mid: #5DCAA5;
+      --red: #E24B4A;
+      --red-light: #FCEBEB;
+      --red-dark: #791F1F;
+      --red-mid: #F09595;
+      --blue-light: #E6F1FB;
+      --blue-dark: #0C447C;
+      --blue-mid: #85B7EB;
+      --purple-light: #EEEDFE;
+      --purple-dark: #3C3489;
+      --purple-mid: #AFA9EC;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --amber-mid: #FAC775;
+      --bg: #f5f7f5;
+      --card: #ffffff;
+      --text: #1a2a1a;
+      --text-muted: #5a6a5a;
+      --border: rgba(0,0,0,0.1);
+      --border-light: rgba(0,0,0,0.06);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1a14;
+        --card: #1a2a1e;
+        --text: #e8f0e8;
+        --text-muted: #7a9a7a;
+        --border: rgba(255,255,255,0.1);
+        --border-light: rgba(255,255,255,0.05);
+        --green-light: #0a2a1e;
+        --red-light: #2a0f0f;
+        --blue-light: #0a1a2a;
+        --purple-light: #1a1530;
+        --amber-light: #2a1a05;
+        --green-dark: #5DCAA5;
+        --red-dark: #F09595;
+        --blue-dark: #85B7EB;
+        --purple-dark: #AFA9EC;
+        --amber-dark: #FAC775;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+    }
+    /* LAYOUT */
+    #app { display: flex; flex-direction: column; height: 100%; height: 100dvh; }
+    #header {
+      background: var(--card);
+      border-bottom: 0.5px solid var(--border);
+      padding: 12px 16px 0;
+      flex-shrink: 0;
+    }
+    #header h1 { font-size: 17px; font-weight: 600; color: var(--green); margin-bottom: 10px; letter-spacing: -0.3px; }
+    .top-nav { display: flex; gap: 4px; }
+    .top-nav button {
+      flex: 1; padding: 8px 4px; font-size: 12px; font-weight: 500;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      border: 0.5px solid var(--border); border-bottom: none;
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .top-nav button.active { background: var(--bg); color: var(--green); font-weight: 600; border-color: var(--border); }
+    #content { flex: 1; overflow-y: auto; padding: 14px 14px 24px; -webkit-overflow-scrolling: touch; }
+    .page { display: none; }
+    .page.on { display: block; }
+
+    /* UTILS */
+    .info-box {
+      background: var(--green-light); border-left: 3px solid var(--green);
+      padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 12px;
+    }
+    .card { background: var(--card); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 8px; }
+
+    /* COURS TABS */
+    .cours-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 14px; }
+    .cours-tabs button {
+      font-size: 12px; padding: 6px 10px; border-radius: 20px;
+      border: 0.5px solid var(--border); background: var(--card);
+      color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .cours-tabs button.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 500; }
+    .cours-section { display: none; }
+    .cours-section.on { display: block; }
+
+    /* TABLES */
+    .table-nav { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+    .table-nav button {
+      font-size: 12px; padding: 4px 8px; border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border); background: var(--card);
+      color: var(--text-muted); cursor: pointer; min-width: 32px; text-align: center;
+    }
+    .table-nav button.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); font-weight: 600; }
+    .table-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .t-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 10px; border-radius: var(--radius-sm);
+      background: var(--card); border: 0.5px solid var(--border-light);
+      font-size: 13px;
+    }
+    .t-row .res { font-weight: 600; color: var(--green); }
+
+    /* CARRÉS / CUBES */
+    .pw-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+    .pw-tabs button {
+      font-size: 12px; padding: 6px 14px; border-radius: 20px;
+      border: 0.5px solid var(--border); background: var(--card);
+      color: var(--text-muted); cursor: pointer;
+    }
+    .pw-tabs button.active { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-mid); font-weight: 600; }
+    .sq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .sq-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 10px; border-radius: var(--radius-sm);
+      background: var(--card); border: 0.5px solid var(--border-light); font-size: 13px;
+    }
+    .sq-row .sq-val { font-weight: 600; color: var(--purple-dark); }
+
+    /* PREMIERS */
+    .prime-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 10px; }
+    .pchip {
+      padding: 6px 2px; text-align: center; font-size: 12px;
+      border-radius: var(--radius-sm); border: 0.5px solid var(--border-light);
+      color: var(--text-muted); background: var(--card);
+    }
+    .pchip.p { background: var(--purple-light); border-color: var(--purple-mid); color: var(--purple-dark); font-weight: 600; }
+
+    /* PARFAITS */
+    .perf-card { background: var(--card); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 14px; margin-bottom: 8px; }
+    .perf-n { font-size: 20px; font-weight: 700; color: var(--amber-dark); }
+    .perf-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--amber-light); color: var(--amber-dark); font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .perf-d { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+
+    /* DIVISIBILITE */
+    .rule-card { background: var(--card); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 11px 13px; margin-bottom: 7px; display: flex; gap: 12px; align-items: flex-start; }
+    .rule-num { font-size: 22px; font-weight: 700; color: var(--green); min-width: 30px; }
+    .rule-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .rule-ex { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; font-style: italic; }
+
+    /* CONFIG */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 0.5px solid var(--border-light);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 14px; color: var(--text); }
+    .toggle-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; top:0;left:0;right:0;bottom:0; background: var(--border); border-radius: 24px; cursor: pointer; transition: .2s; }
+    .slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
+    input:checked + .slider { background: var(--green); }
+    input:checked + .slider:before { transform: translateX(18px); }
+    .start-btn {
+      width: 100%; padding: 14px; font-size: 16px; font-weight: 600;
+      border-radius: var(--radius); border: none; background: var(--green);
+      color: #fff; cursor: pointer; margin-top: 6px; letter-spacing: -0.2px;
+      transition: background .15s; box-shadow: 0 2px 8px rgba(29,158,117,.3);
+    }
+    .start-btn:hover { background: var(--green-dark); }
+    .start-btn:disabled { background: var(--border); color: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+
+    /* QUIZ */
+    .score-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .score-left { font-size: 13px; color: var(--text-muted); }
+    .score-right { display: flex; gap: 12px; }
+    .score-ok { font-size: 15px; font-weight: 600; color: var(--green); }
+    .score-ko { font-size: 15px; font-weight: 600; color: var(--red); }
+    .q-box {
+      background: var(--card); border-radius: var(--radius);
+      border: 1.5px solid var(--border); padding: 16px;
+      margin-bottom: 10px; transition: border-color .2s, background .2s;
+    }
+    .q-box.correct-state { border-color: var(--green); background: var(--green-light); }
+    .q-box.wrong-state { border-color: var(--red); background: var(--red-light); }
+    .q-text { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 16px; color: var(--text); letter-spacing: -0.5px; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ch-btn {
+      padding: 12px 8px; font-size: 15px; font-weight: 500;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+      background: var(--card); cursor: pointer; color: var(--text);
+      transition: all .15s; text-align: center; min-height: 48px;
+    }
+    .ch-btn:hover:not(:disabled) { background: var(--green-light); border-color: var(--green-mid); }
+    .ch-btn.correct { background: var(--green) !important; border-color: var(--green) !important; color: #fff !important; font-weight: 700; }
+    .ch-btn.wrong { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
+    .ch-btn:disabled { cursor: not-allowed; }
+    .expl-box {
+      margin-top: 12px; border-radius: var(--radius-sm); padding: 10px 12px;
+      font-size: 13px; line-height: 1.6; display: none;
+    }
+    .expl-box.show { display: block; }
+    .expl-box.correct { background: rgba(29,158,117,.12); color: var(--green-dark); border: 0.5px solid var(--green-mid); }
+    .expl-box.wrong { background: rgba(226,75,74,.1); color: var(--red-dark); border: 0.5px solid var(--red-mid); }
+    .next-btn {
+      width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+      border-radius: var(--radius); border: 1.5px solid var(--border);
+      background: var(--card); cursor: pointer; color: var(--text);
+      display: none; transition: all .15s;
+    }
+    .next-btn:hover { background: var(--bg); }
+    .back-btn {
+      font-size: 13px; color: var(--text-muted); background: none; border: none;
+      cursor: pointer; padding: 0; margin-bottom: 14px; display: flex; align-items: center; gap: 5px;
+    }
+    .back-btn:hover { color: var(--text); }
+    .back-btn svg { width: 16px; height: 16px; }
+
+    /* PROGRESS BAR */
+    .progress-wrap { height: 4px; background: var(--border-light); border-radius: 4px; margin-bottom: 12px; }
+    .progress-bar { height: 4px; background: var(--green); border-radius: 4px; transition: width .3s; }
+
+    /* RESULT */
+    .result-box { text-align: center; padding: 2rem 1rem; }
+    .result-emoji { font-size: 48px; margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 800; color: var(--green); margin-bottom: 4px; letter-spacing: -2px; }
+    .result-pct { font-size: 15px; color: var(--text-muted); margin-bottom: 8px; }
+    .result-msg { font-size: 16px; color: var(--text); margin-bottom: 2rem; font-weight: 500; }
+    .result-btns { display: flex; flex-direction: column; gap: 8px; }
+    .btn-primary { padding: 13px; font-size: 15px; font-weight: 600; border-radius: var(--radius); border: none; background: var(--green); color: #fff; cursor: pointer; }
+    .btn-secondary { padding: 12px; font-size: 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+
+    /* SCROLLBAR */
+    #content::-webkit-scrollbar { width: 4px; }
+    #content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <h1>📐 Tage Mage — Maths</h1>
+    <div class="top-nav">
+      <button class="active" onclick="switchPage('cours')">Cours</button>
+      <button onclick="switchPage('config')">⚙ Quiz</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ===== COURS ===== -->
+    <div id="cours" class="page on">
+      <div class="cours-tabs">
+        <button class="active" onclick="showCours('tables')">Tables</button>
+        <button onclick="showCours('carres')">Carrés</button>
+        <button onclick="showCours('cubes')">Cubes</button>
+        <button onclick="showCours('premiers')">Premiers</button>
+        <button onclick="showCours('parfaits')">Parfaits</button>
+        <button onclick="showCours('divis')">Divisibilité</button>
+      </div>
+
+      <div id="c-tables" class="cours-section on">
+        <div class="table-nav" id="tnav"></div>
+        <div class="table-rows" id="trows"></div>
+      </div>
+
+      <div id="c-carres" class="cours-section">
+        <div class="info-box"><strong>Carré parfait :</strong> sa racine carrée est un entier.<br>Astuce : (n+1)² = n² + 2n + 1. Ex : 13² = 144+26+1 = 169</div>
+        <div class="pw-tabs">
+          <button class="active" onclick="loadPow('sq',this)">Carrés (1² à 25²)</button>
+          <button onclick="loadPow('cu',this)">Cubes (1³ à 12³)</button>
+        </div>
+        <div class="sq-grid" id="sq-grid"></div>
+      </div>
+
+      <div id="c-cubes" class="cours-section">
+        <div class="info-box">Cubes de 1³ à 12³ à connaître.</div>
+        <div class="sq-grid" id="cu-grid"></div>
+      </div>
+
+      <div id="c-premiers" class="cours-section">
+        <div class="info-box">
+          <strong>Méthode :</strong> pour vérifier si n est premier, tester les diviseurs jusqu'à √n seulement.<br><br>
+          <strong>Astuce :</strong> tout nombre premier &gt; 3 est de la forme 6k−1 ou 6k+1.<br><br>
+          <strong>Exceptions à retenir :</strong> 1 n'est pas premier. 2 et 3 le sont.
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"><span style="display:inline-block;width:12px;height:12px;background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:3px;vertical-align:middle;margin-right:4px;"></span> = nombre premier</p>
+        <div class="prime-grid" id="prime-grid"></div>
+      </div>
+
+      <div id="c-parfaits" class="cours-section">
+        <div class="info-box">
+          <strong>Nombre parfait</strong> = somme de ses diviseurs propres (tous ses diviseurs sauf lui-même).<br><br>
+          <strong>Méthode :</strong> ① Lister tous les diviseurs de n &nbsp;② Sommer ceux &lt; n &nbsp;③ Vérifier si total = n
+        </div>
+        <div id="perf-list"></div>
+      </div>
+
+      <div id="c-divis" class="cours-section">
+        <div id="divis-list"></div>
+      </div>
+    </div>
+
+    <!-- ===== CONFIG QUIZ ===== -->
+    <div id="config" class="page">
+      <div class="card">
+        <div class="section-label">Thèmes du quiz</div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Tables de multiplication</div><div class="toggle-sub">1 à 20 × 1 à 20</div></div>
+          <label class="toggle"><input type="checkbox" id="t-tables" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Carrés parfaits</div><div class="toggle-sub">1² à 25²</div></div>
+          <label class="toggle"><input type="checkbox" id="t-sq" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Cubes</div><div class="toggle-sub">1³ à 12³</div></div>
+          <label class="toggle"><input type="checkbox" id="t-cu" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Nombres premiers</div><div class="toggle-sub">Premier ou pas ? (2 à 100)</div></div>
+          <label class="toggle"><input type="checkbox" id="t-prime" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Nombres parfaits</div><div class="toggle-sub">Parfait ou pas ?</div></div>
+          <label class="toggle"><input type="checkbox" id="t-perf" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Critères de divisibilité</div><div class="toggle-sub">Divisible par 2 à 11 ?</div></div>
+          <label class="toggle"><input type="checkbox" id="t-div" checked><span class="slider"></span></label>
+        </div>
+      </div>
+      <div class="card" style="margin-top:4px;">
+        <div class="section-label">Nombre de questions</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="ch-btn active" style="flex:1;min-height:40px;font-size:13px;" onclick="setQCount(10,this)">10</button>
+          <button class="ch-btn active" style="flex:1;min-height:40px;font-size:13px;background:var(--green-light);border-color:var(--green-mid);color:var(--green-dark);" onclick="setQCount(20,this)">20</button>
+          <button class="ch-btn" style="flex:1;min-height:40px;font-size:13px;" onclick="setQCount(30,this)">30</button>
+          <button class="ch-btn" style="flex:1;min-height:40px;font-size:13px;" onclick="setQCount(50,this)">50</button>
+        </div>
+      </div>
+      <button class="start-btn" onclick="startQuiz()" id="start-btn">Lancer le quiz →</button>
+    </div>
+
+    <!-- ===== QUIZ PLAY ===== -->
+    <div id="play" class="page">
+      <button class="back-btn" onclick="backToConfig()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Changer les thèmes
+      </button>
+      <div class="progress-wrap"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+      <div class="score-bar">
+        <span class="score-left">Question <span id="q-num">1</span> / <span id="q-total">20</span></span>
+        <div class="score-right">
+          <span class="score-ok">✓ <span id="s-ok">0</span></span>
+          <span class="score-ko">✗ <span id="s-ko">0</span></span>
+        </div>
+      </div>
+      <div class="q-box" id="q-box">
+        <div class="q-text" id="q-text"></div>
+        <div class="choices" id="q-choices"></div>
+        <div class="expl-box" id="q-expl"></div>
+      </div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">Question suivante →</button>
+    </div>
+
+    <!-- ===== RÉSULTAT ===== -->
+    <div id="result" class="page">
+      <div class="result-box">
+        <div class="result-emoji" id="res-emoji">🎉</div>
+        <div class="result-score" id="res-score"></div>
+        <div class="result-pct" id="res-pct"></div>
+        <div class="result-msg" id="res-msg"></div>
+        <div class="result-btns">
+          <button class="btn-primary" onclick="startQuiz()">Rejouer avec les mêmes thèmes</button>
+          <button class="btn-secondary" onclick="backToConfig()">Changer les thèmes</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+// ===== DATA =====
+const PERFECTS = [6, 28, 496, 8128];
+const PERF_DATA = [
+  {n:6, divs:[1,2,3]},
+  {n:28, divs:[1,2,4,7,14]},
+  {n:496, divs:[1,2,4,8,16,31,62,124,248]},
+  {n:8128, divs:[1,2,4,8,16,32,64,127,254,508,1016,2032,4064]}
+];
+const DIV = [
+  {d:2, rule:"Le dernier chiffre est pair (0, 2, 4, 6, 8).", ex:"348 → dernier chiffre 8, pair → divisible par 2"},
+  {d:3, rule:"La somme des chiffres est divisible par 3.", ex:"372 → 3+7+2 = 12 → 12 ÷ 3 = 4 → divisible"},
+  {d:4, rule:"Les deux derniers chiffres forment un nombre divisible par 4.", ex:"1 516 → 16 ÷ 4 = 4 → divisible"},
+  {d:5, rule:"Le dernier chiffre est 0 ou 5.", ex:"275 → dernier chiffre 5 → divisible"},
+  {d:6, rule:"Divisible par 2 ET par 3 simultanément.", ex:"114 → pair ✓ et 1+1+4=6, div par 3 ✓ → divisible par 6"},
+  {d:7, rule:"Doubler le dernier chiffre et le soustraire au reste. Répéter jusqu'à obtenir un multiple de 7 connu.", ex:"203 → 20 − 2×3 = 14 → 14 est multiple de 7 → divisible"},
+  {d:8, rule:"Les trois derniers chiffres forment un nombre divisible par 8.", ex:"1 024 → 024 = 24, 24 ÷ 8 = 3 → divisible"},
+  {d:9, rule:"La somme des chiffres est divisible par 9.", ex:"738 → 7+3+8 = 18 → 18 ÷ 9 = 2 → divisible"},
+  {d:10, rule:"Le dernier chiffre est 0.", ex:"1 230 → dernier chiffre 0 → divisible"},
+  {d:11, rule:"La somme alternée des chiffres (en alternant + et −, de droite à gauche) est un multiple de 11 (y compris 0).", ex:"2 574 → 4 − 7 + 5 − 2 = 0 → 0 est multiple de 11 → divisible"}
+];
+
+// ===== HELPERS =====
+function isPrime(n) {
+  if (n < 2) return false;
+  for (let i = 2; i <= Math.sqrt(n); i++) if (n % i === 0) return false;
+  return true;
+}
+function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function shuffle(a) { return [...a].sort(() => Math.random() - .5); }
+function digitSum(x) { return String(x).split('').reduce((a, c) => a + parseInt(c), 0); }
+function altSum(x) {
+  const s = String(x); let r = 0;
+  for (let i = 0; i < s.length; i++) r += (i % 2 === 0 ? 1 : -1) * parseInt(s[s.length - 1 - i]);
+  return r;
+}
+
+// ===== BUILD COURS =====
+(function () {
+  // Tables nav
+  const tnav = document.getElementById('tnav');
+  for (let i = 1; i <= 20; i++) {
+    const b = document.createElement('button');
+    b.textContent = i; if (i === 2) b.classList.add('active');
+    b.onclick = () => { document.querySelectorAll('.table-nav button').forEach(x => x.classList.remove('active')); b.classList.add('active'); loadTable(i); };
+    tnav.appendChild(b);
+  }
+  loadTable(2);
+
+  // Carrés
+  const sg = document.getElementById('sq-grid');
+  for (let i = 1; i <= 25; i++) {
+    const r = document.createElement('div'); r.className = 'sq-row';
+    r.innerHTML = `<span>${i}²</span><span class="sq-val">${i * i}</span>`; sg.appendChild(r);
+  }
+  // Cubes
+  const cg = document.getElementById('cu-grid');
+  for (let i = 1; i <= 12; i++) {
+    const r = document.createElement('div'); r.className = 'sq-row';
+    r.innerHTML = `<span>${i}³</span><span class="sq-val">${i * i * i}</span>`; cg.appendChild(r);
+  }
+  // Premiers
+  const pg = document.getElementById('prime-grid');
+  for (let i = 2; i <= 100; i++) {
+    const c = document.createElement('div'); c.className = 'pchip' + (isPrime(i) ? ' p' : '');
+    c.textContent = i; pg.appendChild(c);
+  }
+  // Parfaits
+  const pl = document.getElementById('perf-list');
+  PERF_DATA.forEach(p => {
+    const d = document.createElement('div'); d.className = 'perf-card';
+    d.innerHTML = `<div><span class="perf-n">${p.n}</span><span class="perf-badge">Parfait</span></div><div class="perf-d">Diviseurs propres : ${p.divs.join(' + ')} = ${p.n}</div>`;
+    pl.appendChild(d);
+  });
+  // Divisibilité
+  const dl = document.getElementById('divis-list');
+  DIV.forEach(r => {
+    const c = document.createElement('div'); c.className = 'rule-card';
+    c.innerHTML = `<div class="rule-num">${r.d}</div><div><div class="rule-text">${r.rule}</div><div class="rule-ex">${r.ex}</div></div>`;
+    dl.appendChild(c);
+  });
+})();
+
+function loadTable(n) {
+  const rows = document.getElementById('trows'); rows.innerHTML = '';
+  for (let i = 1; i <= 20; i++) {
+    const r = document.createElement('div'); r.className = 't-row';
+    r.innerHTML = `<span style="color:var(--text-muted)">${n} × ${i}</span><span class="res">${n * i}</span>`;
+    rows.appendChild(r);
+  }
+}
+
+function loadPow(mode, btn) {
+  document.querySelectorAll('.pw-tabs button').forEach(b => { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('c-carres').querySelector('.sq-grid').innerHTML = '';
+  const sg = document.getElementById('sq-grid');
+  if (mode === 'sq') {
+    for (let i = 1; i <= 25; i++) { const r = document.createElement('div'); r.className = 'sq-row'; r.innerHTML = `<span>${i}²</span><span class="sq-val">${i * i}</span>`; sg.appendChild(r); }
+  } else {
+    for (let i = 1; i <= 12; i++) { const r = document.createElement('div'); r.className = 'sq-row'; r.innerHTML = `<span>${i}³</span><span class="sq-val">${i * i * i}</span>`; sg.appendChild(r); }
+  }
+}
+
+function showCours(id) {
+  document.querySelectorAll('.cours-section').forEach(s => s.classList.remove('on'));
+  document.getElementById('c-' + id).classList.add('on');
+  document.querySelectorAll('.cours-tabs button').forEach((b, i) => {
+    b.classList.toggle('active', ['tables','carres','cubes','premiers','parfaits','divis'][i] === id);
+  });
+}
+
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.top-nav button').forEach((b, i) => {
+    b.classList.toggle('active', ['cours', 'config'][i] === id);
+  });
+}
+
+// ===== QUIZ =====
+let score = { ok: 0, ko: 0, total: 0 };
+let answered = false;
+let activeFilters = [];
+let qCount = 20;
+let currentQ = null;
+
+function setQCount(n, btn) {
+  qCount = n;
+  document.querySelectorAll('.card button.ch-btn').forEach(b => {
+    b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
+  });
+  btn.style.background = 'var(--green-light)';
+  btn.style.borderColor = 'var(--green-mid)';
+  btn.style.color = 'var(--green-dark)';
+}
+
+function getFilters() {
+  const f = [];
+  if (document.getElementById('t-tables').checked) f.push('table');
+  if (document.getElementById('t-sq').checked) f.push('sq');
+  if (document.getElementById('t-cu').checked) f.push('cu');
+  if (document.getElementById('t-prime').checked) f.push('prime');
+  if (document.getElementById('t-perf').checked) f.push('perf');
+  if (document.getElementById('t-div').checked) f.push('div');
+  return f;
+}
+
+function startQuiz() {
+  activeFilters = getFilters();
+  if (!activeFilters.length) return;
+  score = { ok: 0, ko: 0, total: 0 };
+  document.getElementById('s-ok').textContent = 0;
+  document.getElementById('s-ko').textContent = 0;
+  document.getElementById('q-total').textContent = qCount;
+  document.getElementById('prog-bar').style.width = '0%';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.top-nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('play').classList.add('on');
+  currentQ = null;
+  nextQ();
+}
+
+function backToConfig() { switchPage('config'); }
+
+function generateQ() {
+  const type = activeFilters[rand(0, activeFilters.length - 1)];
+
+  if (type === 'table') {
+    const a = rand(2, 20), b = rand(1, 20), ans = a * b;
+    const w = new Set();
+    while (w.size < 3) { const v = ans + rand(1, 5) * (rand(0, 1) ? 1 : -1) * rand(1, 3); if (v !== ans && v > 0) w.add(v); }
+    return { q: `${a} × ${b} = ?`, ans, choices: shuffle([ans, ...w]), type, expl_ok: `✓ ${a} × ${b} = ${ans}`, expl_ko: `${a} × ${b} = ${ans}. Revoir la table de ${a}.` };
+  }
+
+  if (type === 'sq') {
+    const a = rand(1, 25), ans = a * a;
+    const w = new Set();
+    while (w.size < 3) { const v = ans + rand(1, 6) * (rand(0, 1) ? 2 : -2) * rand(1, 3); if (v !== ans && v > 0) w.add(v); }
+    return { q: `${a}² = ?`, ans, choices: shuffle([ans, ...w]), type, expl_ok: `✓ ${a}² = ${a} × ${a} = ${ans}`, expl_ko: `${a}² = ${a} × ${a} = ${ans}` };
+  }
+
+  if (type === 'cu') {
+    const a = rand(1, 12), ans = a * a * a;
+    const w = new Set();
+    while (w.size < 3) { const off = rand(2, Math.max(3, Math.floor(ans * 0.15))); const v = ans + (rand(0, 1) ? off : -off); if (v !== ans && v > 0) w.add(v); }
+    return { q: `${a}³ = ?`, ans, choices: shuffle([ans, ...w]), type, expl_ok: `✓ ${a}³ = ${a}×${a}×${a} = ${ans}`, expl_ko: `${a}³ = ${a}×${a}×${a} = ${ans}` };
+  }
+
+  if (type === 'prime') {
+    const n = rand(2, 100);
+    const p = isPrime(n);
+    const ans = p ? 'Premier' : 'Pas premier';
+    let expl;
+    if (p) {
+      expl = `${n} est premier : aucun entier de 2 à ${Math.floor(Math.sqrt(n))} ne le divise.`;
+    } else {
+      let factor = 0; for (let i = 2; i <= n / 2; i++) { if (n % i === 0) { factor = i; break; } }
+      expl = `${n} n'est pas premier : ${n} = ${factor} × ${n / factor}.`;
+    }
+    return { q: `${n} est-il premier ?`, ans, choices: ['Premier', 'Pas premier'], type, expl_ok: '✓ ' + expl, expl_ko: expl };
+  }
+
+  if (type === 'perf') {
+    const pool = [6, 28, 496, 8128, 1, 10, 12, 15, 30, 100, 120, 220, 284, 36, 18, 24, 48];
+    const n = pool[rand(0, pool.length - 1)];
+    const p = PERFECTS.includes(n);
+    const ans = p ? 'Parfait' : 'Pas parfait';
+    let expl;
+    if (p) { const pd = PERF_DATA.find(x => x.n === n); expl = `${n} est parfait : ${pd.divs.join('+')} = ${n}.`; }
+    else { expl = `${n} n'est pas parfait. Les 4 nombres parfaits à connaître : 6, 28, 496, 8 128.`; }
+    return { q: `${n} est-il parfait ?`, ans, choices: ['Parfait', 'Pas parfait'], type, expl_ok: '✓ ' + expl, expl_ko: expl };
+  }
+
+  if (type === 'div') {
+    const rule = DIV[rand(0, DIV.length - 1)];
+    const n = rand(100, 9999);
+    const ok = (n % rule.d === 0);
+    const ans = ok ? 'Oui' : 'Non';
+    let detail = '';
+    if (rule.d === 2) detail = `Dernier chiffre de ${n} : ${n % 10} → ${n % 2 === 0 ? 'pair → divisible' : 'impair → non divisible'} par 2.`;
+    else if (rule.d === 3) { const s = digitSum(n); detail = `Somme des chiffres de ${n} : ${String(n).split('').join('+')} = ${s} → ${s % 3 === 0 ? `${s} ÷ 3 = ${s / 3} → divisible` : `${s} non divisible par 3`}.`; }
+    else if (rule.d === 4) { const l2 = n % 100; detail = `Deux derniers chiffres de ${n} : ${l2} → ${l2 % 4 === 0 ? `${l2} ÷ 4 = ${l2 / 4} → divisible` : `${l2} non divisible par 4`}.`; }
+    else if (rule.d === 5) detail = `Dernier chiffre de ${n} : ${n % 10} → ${(n % 10 === 0 || n % 10 === 5) ? '0 ou 5 → divisible' : 'ni 0 ni 5 → non divisible'} par 5.`;
+    else if (rule.d === 6) { const ds = digitSum(n); detail = `${n} est ${n % 2 === 0 ? 'pair (÷2 ✓)' : 'impair (÷2 ✗)'} et somme chiffres = ${ds} (÷3 ${ds % 3 === 0 ? '✓' : '✗'}) → ${n % 6 === 0 ? 'divisible' : 'non divisible'} par 6.`; }
+    else if (rule.d === 7) detail = `Critère du 7 pour ${n} : résultat ${n % 7} → ${n % 7 === 0 ? 'divisible' : 'non divisible'} par 7.`;
+    else if (rule.d === 8) { const l3 = n % 1000; detail = `Trois derniers chiffres de ${n} : ${l3} → ${l3 % 8 === 0 ? `${l3} ÷ 8 = ${l3 / 8} → divisible` : `${l3} non divisible par 8`}.`; }
+    else if (rule.d === 9) { const s = digitSum(n); detail = `Somme des chiffres de ${n} : ${String(n).split('').join('+')} = ${s} → ${s % 9 === 0 ? `${s} ÷ 9 = ${s / 9} → divisible` : `${s} non divisible par 9`}.`; }
+    else if (rule.d === 10) detail = `Dernier chiffre de ${n} : ${n % 10} → ${n % 10 === 0 ? '0 → divisible' : 'non 0 → non divisible'} par 10.`;
+    else if (rule.d === 11) { const alt = altSum(n); const digits = String(n).split('').reverse(); const shown = digits.map((d, i) => (i === 0 ? '' : (i % 2 === 0 ? '+' : '−')) + d).join(''); detail = `Somme alternée de ${n} (droite → gauche) : ${shown} = ${alt} → ${alt % 11 === 0 ? `multiple de 11 → divisible` : `${alt} non multiple de 11 → non divisible`} par 11.`; }
+    const correct_ans = ok ? 'Oui' : 'Non';
+    return { q: `${n} divisible par ${rule.d} ?`, ans: correct_ans, choices: ['Oui', 'Non'], type, expl_ok: `✓ Oui ! ${detail}`, expl_ko: `Non. ${detail}` };
+  }
+}
+
+function nextQ() {
+  if (score.total >= qCount) { showResult(); return; }
+  answered = false;
+  currentQ = generateQ();
+  score.total++;
+  document.getElementById('q-num').textContent = score.total;
+  document.getElementById('prog-bar').style.width = ((score.total - 1) / qCount * 100) + '%';
+  document.getElementById('q-text').textContent = currentQ.q;
+  const ch = document.getElementById('q-choices'); ch.innerHTML = '';
+  currentQ.choices.forEach(c => {
+    const b = document.createElement('button'); b.className = 'ch-btn'; b.textContent = c;
+    b.onclick = () => checkA(String(c), b);
+    ch.appendChild(b);
+  });
+  const qb = document.getElementById('q-box');
+  qb.classList.remove('correct-state', 'wrong-state');
+  const ex = document.getElementById('q-expl'); ex.className = 'expl-box'; ex.textContent = '';
+  const nb = document.getElementById('next-btn'); nb.style.display = 'none'; nb.onclick = nextQ;
+  if (score.total >= qCount) nb.textContent = 'Voir les résultats →';
+  else nb.textContent = 'Question suivante →';
+}
+
+function checkA(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const correct = chosen === String(currentQ.ans);
+  const qb = document.getElementById('q-box');
+  const ex = document.getElementById('q-expl');
+  if (correct) {
+    score.ok++;
+    btn.classList.add('correct');
+    qb.classList.add('correct-state');
+    ex.className = 'expl-box correct show';
+    ex.textContent = currentQ.expl_ok;
+  } else {
+    score.ko++;
+    btn.classList.add('wrong');
+    qb.classList.add('wrong-state');
+    document.querySelectorAll('.ch-btn').forEach(b => { if (b.textContent === String(currentQ.ans)) b.classList.add('correct'); });
+    ex.className = 'expl-box wrong show';
+    ex.textContent = currentQ.expl_ko;
+  }
+  document.getElementById('s-ok').textContent = score.ok;
+  document.getElementById('s-ko').textContent = score.ko;
+  document.querySelectorAll('.ch-btn').forEach(b => b.disabled = true);
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function showResult() {
+  document.getElementById('prog-bar').style.width = '100%';
+  setTimeout(() => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+    document.getElementById('result').classList.add('on');
+    const pct = Math.round(score.ok / score.total * 100);
+    document.getElementById('res-score').textContent = `${score.ok}/${score.total}`;
+    document.getElementById('res-pct').textContent = `${pct}% de réussite`;
+    let emoji = '😅', msg = 'Continue, la répétition est la clé !';
+    if (pct >= 90) { emoji = '🏆'; msg = 'Excellent ! Tu maîtrises ces notions.'; }
+    else if (pct >= 75) { emoji = '🎉'; msg = 'Très bien ! Quelques points à revoir.'; }
+    else if (pct >= 55) { emoji = '💪'; msg = 'Pas mal, continue à t\'entraîner !'; }
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-msg').textContent = msg;
+  }, 300);
+}
+
+// Toggle validation
+document.querySelectorAll('.toggle input').forEach(cb => {
+  cb.addEventListener('change', () => {
+    document.getElementById('start-btn').disabled = getFilters().length === 0;
+  });
+});
+</script>
+
+<!-- SERVICE WORKER REGISTRATION -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
